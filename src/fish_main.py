@@ -21,6 +21,7 @@ pyautogui.FAILSAFE = True
 FishMainLangFlag = True # True is Chinese, False is English
 logger = None
 clicker = None
+g_saved_bait_choice = None  # Remember user's bait choice across restarts
 class FishMainStatus:
     """游戏窗口类"""
     def __init__(self):
@@ -29,6 +30,8 @@ class FishMainStatus:
         self.resetFlag = True
         self.gamewindow = None
         self.FishStopFlag = False
+        self.FishRestartFlag = False
+        self.FishPausedFlag = False
         self.yuer = None
         self.yugan = None
         self.shanggoufind = None
@@ -57,6 +60,12 @@ class FishMainStatus:
         self.status = data
     def stop(self):
         self.FishStopFlag = True
+    def restart(self):
+        self.FishRestartFlag = True
+    def pause(self):
+        self.FishPausedFlag = True
+    def unpause(self):
+        self.FishPausedFlag = False
     def reload(self):
         # Reload window to ensure switched to Star Echo window before taking screenshot
         SwitchToGame()
@@ -107,21 +116,31 @@ def InitAllLang():
     InitFishLogicLang(mylang)
     log_init()
 def GuideInfomation():
+    global g_saved_bait_choice
+    
     print("\n\nWelcome to the Star Echo Fishing Script")
     print("This script recognizes 16:9 game windows\n")
     print("Tip 1: Make sure the game has entered the fishing interface!")
     print("Tip 2: The script will automatically replenish Special fish bait after using all rods and bait")
-    print("Tip 3: If infinite clicking occurs, move mouse to upper-left corner, then press [F6] to pause")
-    print("Tip 4: You can use [PageUp] and [PageDown] to adjust detection time (default: 0.06s)")
-    print("Tip 5: Press [F5] to start, [F6] to pause, [ESC] to exit\n")
+    print("Tip 3: Controls: [F5] to start, [F6] to pause (then choose restart/exit)")
+    print("Tip 4: You can use [PageUp] and [PageDown] to adjust detection time (default: 0.06s)\n")
     
-    print("Choose bait type to automatically replenish (default: Special bait):")
-    print("0. Regular bait")
-    print("1. Special bait")
-    choice = input("Enter your choice: ")
-    fishing_choose(choice)
+    # Only ask for bait choice if not already saved
+    if g_saved_bait_choice is None:
+        print("Choose bait type to automatically replenish (default: Special bait):")
+        print("0. Regular bait")
+        print("1. Special bait")
+        choice = input("Enter your choice: ")
+        g_saved_bait_choice = choice
+        fishing_choose(choice)
+    else:
+        # Use saved choice
+        fishing_choose(g_saved_bait_choice)
+        bait_type = "Regular bait" if g_saved_bait_choice == "0" else "Special bait"
+        print(f"Using saved bait preference: {bait_type}")
+    
     print("\nPress [F5] to start the script!")
-    print("Remember: [Hold F6] to pause, [ESC] to exit\n")
+    print("Controls: [F6] to pause, then [F5]=restart or [ESC]=exit\n")
 
 def fish_init():
     InitAllLang()
@@ -142,16 +161,36 @@ def fish_init():
 
 def fish_KeyboardStopScript():
     clicker = get_clicker()
-    if keyboard.is_pressed('F6'):
-        g_FishMain.stop()
+    
+    # F6 = Pause and show menu
+    if keyboard.is_pressed('F6') and not g_FishMain.FishPausedFlag:
+        g_FishMain.pause()
         clicker.stop_clicking()
         pyautogui.keyUp('A')
         pyautogui.keyUp('D')
         pyautogui.mouseUp(button='left')
-        if FishMainLangFlag:
-            print("✅ Detected F6 key, stop script")
-        else:
-            print("✅ Detected F6 key, stop script")
+        print("\n" + "="*50)
+        print("⏸️  PAUSED")
+        print("="*50)
+        print("Options:")
+        print("  [F5] - Restart script from beginning")
+        print("  [ESC] - Exit program completely")
+        print("="*50 + "\n")
+        
+        # Wait for user choice
+        time.sleep(0.5)  # Debounce
+        while g_FishMain.FishPausedFlag:
+            if keyboard.is_pressed('F5'):
+                g_FishMain.restart()
+                print("🔄 Restarting script...")
+                time.sleep(0.5)  # Debounce
+                return
+            elif keyboard.is_pressed('esc'):
+                g_FishMain.stop()
+                print("✅ Exiting script...")
+                time.sleep(0.5)  # Debounce
+                return
+            time.sleep(0.1)
 
 def fish_reset():
     SwitchToGame()
@@ -352,6 +391,22 @@ def fish_porgress():
     g_FishMain.resetTimeOutTimes()
     while True:
         fish_KeyboardStopScript()
+        
+        # Check if script should exit
+        if g_FishMain.FishStopFlag:
+            fish_StopData()
+            return
+        
+        # Check if script should restart
+        if g_FishMain.FishRestartFlag:
+            # Don't show final statistics when restarting
+            return 'restart'
+        
+        # If paused, the keyboard handler will deal with it
+        if g_FishMain.FishPausedFlag:
+            time.sleep(0.1)
+            continue
+        
         # If more than 30 seconds have passed, reset the timer
         if g_FishMain.getTimeLag() > timeout:
             g_FishMain.setStartTime()
@@ -362,31 +417,42 @@ def fish_porgress():
                 fish_HardOutDate()
                 g_FishMain.resetTimeOutTimes()
             g_FishMain.addTimeOutTimes()
-
-        if g_FishMain.FishStopFlag:
-            fish_StopData()
-            return
         
         g_FishFunctionDic[g_FishMain.status]()
 
         time.sleep(0.05)
 
 def fish_main():
-    try:
-        fish_init()
-        fish_porgress()
-    except KeyboardInterrupt:
-        if FishMainLangFlag:
-            print("\nUser interrupted the script")
-        else:
-            print("\nUser interrupted the script")
-    except Exception as e:
-        if FishMainLangFlag:
-            print(f"An error occurred: {e}")
-        else:
-            print(f"An error occurred: {e}")
-    finally:
-        pass
+    while True:
+        try:
+            fish_init()
+            result = fish_porgress()
+            
+            # If restart was requested, loop back to beginning
+            if result == 'restart':
+                print("\n" + "="*50)
+                print("Restarting script from the beginning...")
+                print("="*50 + "\n")
+                # Reinitialize the global status
+                global g_FishMain
+                g_FishMain = FishMainStatus()
+                continue
+            else:
+                # Normal exit
+                break
+                
+        except KeyboardInterrupt:
+            if FishMainLangFlag:
+                print("\nUser interrupted the script")
+            else:
+                print("\nUser interrupted the script")
+            break
+        except Exception as e:
+            if FishMainLangFlag:
+                print(f"An error occurred: {e}")
+            else:
+                print(f"An error occurred: {e}")
+            break
 
 if __name__ == "__main__":
     fish_main()

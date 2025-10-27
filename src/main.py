@@ -28,7 +28,5 @@ def select():
     print("Only Fishing is available.")
     print("Starting Fishing script...\n")
     fish.fish_main()
-    print("Press Enter to exit...")
-    input()
 if __name__ == "__main__":
     select()

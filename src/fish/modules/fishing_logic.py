@@ -23,11 +23,11 @@ g_fish_statistics = {
     'common': 0     # Green
 }
 
-# Fish rarity color definitions - these are the BACKGROUND BOX colors
+# Fish rarity color definitions - glow colors from the text
 FISH_RARITY_COLORS = {
-    'common': (41, 128, 185),      # Blue background box
-    'rare': (155, 89, 182),         # Purple background box  
-    'mythical': (241, 196, 15)      # Yellow background box
+    'mythical': (255, 180, 50),     # Orange/Golden glow - check first (rarest)
+    'rare': (155, 89, 182),         # Purple glow
+    'common': (41, 128, 185)        # Blue glow
 }
 def InitFishLogicLang(mylang):
     global FishLogicLangFlag
@@ -353,7 +353,7 @@ def init_clicker():
 
 def detect_fish_rarity(fish_rarity_region):
     """
-    Detect fish rarity by checking the colored background box
+    Detect fish rarity by checking the colored glow
     Returns: 'common', 'rare', 'mythical', or None
     """
     # Take screenshot of the fish rarity region
@@ -367,6 +367,7 @@ def detect_fish_rarity(fish_rarity_region):
     
     best_match_rarity = None
     best_match_ratio = 0
+    match_results = {}
     
     # Analyze the captured image directly for color matching
     for rarity, target_color in FISH_RARITY_COLORS.items():
@@ -375,15 +376,30 @@ def detect_fish_rarity(fish_rarity_region):
         
         # Calculate color differences in the image
         color_diff = np.abs(img_array - target_rgb)
-        matches = np.all(color_diff <= 60, axis=2)  # increased tolerance to 60
+        matches = np.all(color_diff <= 70, axis=2)  # Tolerance of 70
         match_ratio = np.sum(matches) / matches.size
+        match_results[rarity] = match_ratio
         
         # Track the best match
         if match_ratio > best_match_ratio:
             best_match_ratio = match_ratio
             best_match_rarity = rarity
     
-    return best_match_rarity
+    # Debug output
+    print(f"[DEBUG] Color match ratios: Mythical={match_results.get('mythical', 0):.4f}, Rare={match_results.get('rare', 0):.4f}, Common={match_results.get('common', 0):.4f}")
+    
+    # Decision logic: Common and Rare have distinct colors
+    # If Common has highest ratio and > 15%, it's Common
+    if match_results.get('common', 0) > 0.15 and match_results.get('common', 0) >= match_results.get('rare', 0):
+        return 'common'
+    
+    # If Rare has highest ratio and > 10%, it's Rare
+    if match_results.get('rare', 0) > 0.10 and match_results.get('rare', 0) > match_results.get('common', 0):
+        return 'rare'
+    
+    # Otherwise, assume it's Mythical (the rarest, with orange/golden glow)
+    # This handles cases where Mythical color doesn't match well due to glow effects
+    return 'mythical'
 
 def log_fish_catch(rarity):
     """

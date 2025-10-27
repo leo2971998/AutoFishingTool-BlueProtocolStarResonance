@@ -38,8 +38,7 @@ echo   3. Close all other overlays
 echo.
 echo CONTROLS:
 echo   - Press F5 to START the script
-echo   - Press F6 to PAUSE the script
-echo   - Press ESC to EXIT the script
+echo   - Press F6 to PAUSE (then F5=restart or ESC=exit)
 echo.
 echo Starting Fishing Automation in 5 seconds...
 echo (Press Ctrl+C now to cancel)
