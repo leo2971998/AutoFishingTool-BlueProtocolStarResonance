@@ -5,7 +5,7 @@ g_myLang = None
 def PrintText():
     print("\n======================================")
     if GetSysLang() == "zh":
-        print("中文模式")
+        print("Chinese Mode")
     else:
         print("You selected English")
     print("======================================\n")
@@ -29,4 +29,4 @@ def InitSysLang():
 if __name__ == "__main__":
     InitSysLang()
     system_lang = GetSysLang()
-    print(f"检测到的系统语言环境是：{system_lang}")
+    print(f"Detected system language: {system_lang}")

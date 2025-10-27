@@ -7,29 +7,29 @@ global logger
 logger = None
 
 def log_init():
-    global logger  # 声明logger为全局变量，以便在函数外部也能访问
+    global logger  # Declare logger as a global variable so it can be accessed outside the function
     if logger is not None:
         return
     g_log_path = full_imagePath("log.txt")
     # logging.basicConfig(
-    # level=logging.INFO,  # 设置日志级别，如 DEBUG, INFO, WARNING, ERROR, CRITICAL
-    # format='%(asctime)s - %(levelname)s - %(message)s',  # 日志格式
+    # level=logging.INFO,  # Set logging level, such as DEBUG, INFO, WARNING, ERROR, CRITICAL
+    # format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
     # handlers=[
-    #     logging.FileHandler(g_log_path, encoding='utf-8'),  # 输出到文件
-    #     # logging.StreamHandler()  # 同时输出到控制台（可选）
+    #     logging.FileHandler(g_log_path, encoding='utf-8'),  # Output to file
+    #     # logging.StreamHandler()  # Also output to console (optional)
     # ]
     #)
     logger = logging.getLogger('my_app_logger')
-    logger.setLevel(logging.DEBUG) #输出所有信息
+    logger.setLevel(logging.DEBUG) # Output all information
     #logger.setLevel(logging.INFO)
-    # 设置日志格式
+    # Set log format
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-    # 最大单个日志文件大小：1 MB (单位是字节，5 * 1024 * 1024 = 5MB)
+    # Maximum single log file size: 1 MB (unit is bytes, 5 * 1024 * 1024 = 5MB)
     max_bytes = 1 * 1024 * 1024  # 1 MB
-    backup_count = 3  # 最多保留 3 个备份日志文件（加上当前一共最多4个）
+    backup_count = 3  # Keep a maximum of 3 backup log files (plus the current one, a total of 4)
 
-    # 创建 RotatingFileHandler
+    # Create RotatingFileHandler
     file_handler = RotatingFileHandler(
         filename=g_log_path,
         maxBytes=max_bytes,
@@ -38,14 +38,14 @@ def log_init():
     )
     file_handler.setFormatter(formatter)
 
-    # # 同时输出到控制台（可选）
+    # # Also output to console (optional)
     # console_handler = logging.StreamHandler()
     # console_handler.setFormatter(formatter)
 
-    # 添加 handler 到 logger
+    # Add handler to logger
     logger.addHandler(file_handler)
     # logger.addHandler(console_handler)
-    logger.info("日志初始化成功")
+    logger.info("Log initialization successful")
 def GetLogger():
     global logger
     return logger

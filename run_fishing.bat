@@ -2,13 +2,11 @@
 setlocal enabledelayedexpansion
 
 color 0B
-title Star Echo - Fishing Bot
+title Star Echo - Fishing Automation
 
 cls
 echo.
-echo ================================================
 echo   Star Echo Fishing Bot - Automation
-echo ================================================
 echo.
 
 REM Check if venv exists
@@ -30,7 +28,7 @@ if not exist "src" (
     exit /b 1
 )
 
-echo ⚠️  IMPORTANT REQUIREMENTS:
+echo IMPORTANT REQUIREMENTS:
 echo.
 echo   1. Run this program as ADMINISTRATOR
 echo   2. Blue Protocol game must be running

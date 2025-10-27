@@ -10,9 +10,9 @@ from fish.modules.player_control import PlayerCtl,precise_sleep
 from fish.modules.locate import GetSysLang
 g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 def full_imagePath(str):
-    "输入图片名称，返回绝对路径"
+    "Input image name, return absolute path"
     return os.path.join(g_current_dir, str)
-# g_current_dir = full_imagePath("_internal") #打包需要 Package requirement
+# g_current_dir = full_imagePath("_internal") # Package requirement
 g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
@@ -27,8 +27,8 @@ global g_gamewindow
 g_gamewindow = None
 def get_suofang():
 
-    # 定义一个名为get_suofang的函数，用于获取某个变量的值
-    return g_suofang  # 返回g_suofang变量的值
+    # Define a function named get_suofang to get the value of a variable
+    return g_suofang  # Return the value of g_suofang variable
 global UnitLangFlag
 UnitLangFlag = True # True:Chinese False:English
 def InitUnitLang(mylang):
@@ -45,19 +45,19 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
                               scale_range=(0.5, 4.0), scale_steps=10, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
     """
-    多尺度模板匹配
+    Multi-scale template matching
     
-    参数:
-        template_path: 模板图像路径
-        screenshot: 屏幕截图（可选）
-        region: 屏幕区域 (x, y, width, height)（可选）
-        scale_range: 尺度搜索范围 (min_scale, max_scale)
-        scale_steps: 尺度搜索步数
-        method: 模板匹配方法
-        threshold: 匹配阈值
+    Parameters:
+        template_path: Template image path
+        screenshot: Screen screenshot (optional)
+        region: Screen region (x, y, width, height) (optional)
+        scale_range: Scale search range (min_scale, max_scale)
+        scale_steps: Scale search steps
+        method: Template matching method
+        threshold: Match threshold
     
-    返回:
-        匹配位置 (x, y, width, height) 或 None
+    Return:
+        Match location (x, y, width, height) or None
     """
     # 读取模板图像
     template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)

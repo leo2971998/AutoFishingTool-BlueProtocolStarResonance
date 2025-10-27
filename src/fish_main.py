@@ -18,7 +18,7 @@ from fish.modules.locate import GetSysLang,InitSysLang
 STOP_HOUR = 8
 STOP_MINUTE = 0
 pyautogui.FAILSAFE = True
-FishMainLangFlag = True # True为中文，False is English
+FishMainLangFlag = True # True is Chinese, False is English
 logger = None
 clicker = None
 class FishMainStatus:
@@ -58,21 +58,21 @@ class FishMainStatus:
     def stop(self):
         self.FishStopFlag = True
     def reload(self):
-        #重新读取窗口,保证已切换至星痕共鸣窗口再截图
+        # Reload window to ensure switched to Star Echo window before taking screenshot
         SwitchToGame()
         print("Try to get the fishing status window")
         pyautogui.sleep(2)
         gamewindow = None
-        couter = 0
+        counter = 0
         while gamewindow is None:
             screenshot = pyautogui.screenshot()
             screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
             gamewindow = find_game_window(screenshot_cv,"fish")
-            couter += 1
-            if couter > 10:
+            counter += 1
+            if counter > 10:
                 print("Failed to get the fishing status window, please make sure the game has entered the fishing interface")
                 return False
-        # 计算各个检测区域
+        # Calculate each detection area
         self.gamewindow = gamewindow
         self.yuer,self.yugan,self.shanggoufind,self.zuofind,self.youfind,self.jixufind,self.zhanglifind,self.fish_rarity_region = fish_area_cac(gamewindow)
         debug_screenshot_data(screenshot_cv,gamewindow,self.yuer,self.yugan,self.shanggoufind,self.zuofind,self.youfind,self.jixufind,self.zhanglifind)
@@ -88,7 +88,7 @@ def fish_InitClicker():
     clicker = get_clicker()
 
 def should_stop():
-    """检查当前时间是否达到停止时间"""
+    """Check if the current time has reached the stop time"""
     now = datetime.datetime.now()
     if now.hour >= STOP_HOUR and now.minute >= STOP_MINUTE:
         return True
@@ -152,20 +152,20 @@ def fish_KeyboardStopScript():
         pyautogui.keyUp('D')
         pyautogui.mouseUp(button='left')
         if FishMainLangFlag:
-            print("✅ 检测到 F6 键，停止脚本")
+            print("✅ Detected F6 key, stop script")
         else:
             print("✅ Detected F6 key, stop script")
 
 def fish_reset():
     SwitchToGame()
-    # 尝试点击跨日刀问题
+    # Try to click on the daily reset problem
     if(g_FishMain.zhanglifind is not None):
-        resetCounter = 0
-        while(resetCounter < 3):
+        reset_counter = 0
+        while(reset_counter < 3):
             if SolveDaySwitch(g_FishMain.jixufind,g_FishMain.zhanglifind):
                 break
-            resetCounter += 1
-        if resetCounter < 3:
+            reset_counter += 1
+        if reset_counter < 3:
             pass
         else:
             stopScreenshot = pyautogui.screenshot()
@@ -173,10 +173,10 @@ def fish_reset():
             image_save_path = full_imagePath("debug_screenshot_stop.png")
             cv2.imwrite(image_save_path, stopScreenshot_cv)
             if FishMainLangFlag:
-                print("已无法重置回正常MiniGame界面,强制停止脚本\n")
-                logger.critical("已无法重置回正常MiniGame界面,强制停止脚本\n")
-                print(f"debug截图已保存在{image_save_path}\n")
-                logger.critical(f"debug截图已保存在{image_save_path}\n")
+                print("Unable to reset to normal MiniGame interface, force stop script\n")
+                logger.critical("Unable to reset to normal MiniGame interface, force stop script\n")
+                print(f"Debug screenshot has been saved to {image_save_path}\n")
+                logger.critical(f"Debug screenshot has been saved to {image_save_path}\n")
             else:
                 print("Unable to reset to normal MiniGame interface, force stop script\n")
                 logger.critical("Unable to reset to normal MiniGame interface, force stop script\n")
@@ -187,8 +187,8 @@ def fish_reset():
 
 def fish_HardOutDate():
     if FishMainLangFlag:
-        print("⚠️ 超过90秒没动多半是跨日刀来了/出大问题了，强制重启模式")
-        logger.critical("⚠️ 超过90秒没动多半是跨日刀来了/出大问题了，强制重启模式")
+        print("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has arrived or there is a major problem, forcing restart mode")
+        logger.critical("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has arrived or there is a major problem, forcing restart mode")
     else:
         print("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has come or there is a big problem, force restart mode")
         logger.critical("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has come or there is a big problem, force restart mode")
@@ -197,41 +197,41 @@ def fish_HardOutDate():
     else:
         g_FishMain.stop()
         if FishMainLangFlag:
-            print("⚠️ 无法恢复至钓鱼界面，停止脚本")
+            print("⚠️ Can't restore to fishing interface, stop script")
         else:
             print("⚠️ Cant restore to fishing interface, stop script")
     
 def fish_SoftOutDate():
     if FishMainLangFlag:
-        print("⏰ ⚠️ 超过30秒未结束钓鱼流程，强制检查状态...")
-        logger.debug("⏰ ⚠️ 超过30秒未结束钓鱼流程，强制检查状态...")
+        print("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, forcing status check...")
+        logger.debug("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, forcing status check...")
     else:
         print("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, force check status...")
         logger.debug("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, force check status...")
         
     if jinlema(g_FishMain.yugan):
         if FishMainLangFlag:
-            print("🐟 仍在钓鱼中，继续等待")
-            logger.debug("🐟 仍在钓鱼中，继续等待")
+            print("🐟 Still fishing, continue waiting")
+            logger.debug("🐟 Still fishing, continue waiting")
         else:
             print("🐟 Still fishing, continue waiting")
             logger.debug("🐟 Still fishing, continue waiting")
-        #检查是否还在钓鱼界面,如果还在就不管
+        # Check if still in fishing interface, if so don't worry
         return False
     else:
-        # 不在钓鱼界面，检查是否鱼已上钩
+        # Not in fishing interface, check if fish has been hooked
         if(diaodaolema(g_FishMain.jixufind)): 
             if FishMainLangFlag:
-                print("🐟 检测到鱼已上钩，但超时未处理，重新检测")
-                logger.debug("🐟 检测到鱼已上钩，但超时未处理，重新检测")
+                print("🐟 Detected that the fish has been hooked, but timed out without handling, re-checking")
+                logger.debug("🐟 Detected that the fish has been hooked, but timed out without handling, re-checking")
             else:
                 print("🐟 Detected that the fish has been hooked, but it timed out and was not processed, re-checking")
                 logger.debug("🐟 Detected that the fish has been hooked, but it timed out and was not processed, re-checking")
             diaodaole()
         else:
             if FishMainLangFlag:
-                print("❌ 超时且不在钓鱼界面，也没有鱼上钩，重新启动流程")
-                logger.error("❌ 超时且不在钓鱼界面，也没有鱼上钩，重新启动流程")
+                print("❌ Timeout and not in fishing interface, no fish hooked, restart process")
+                logger.error("❌ Timeout and not in fishing interface, no fish hooked, restart process")
             else:
                 print("❌ Timeout and not in the fishing interface, no fish is hooked, restart the process")
                 logger.error("❌ Timeout and not in the fishing interface, no fish is hooked, restart the process")
@@ -252,13 +252,13 @@ def fish_ProgressDefault():
     if youganma(g_FishMain.yugan, g_FishMain.yuer):   
         PlayerCtl.leftmouse(1)
         if FishMainLangFlag:
-            print("🎯 甩杆中...")
+            print("🎯 Casting rod...")
         else:
             print("🎯 Throwing a rod...")
         g_FishMain.setstatus(1)
     else:
         if FishMainLangFlag:
-            logger.debug("❌ 无杆/饵，尝试购买")
+            logger.debug("❌ No rod or bait, try to buy")
         else:
             logger.debug("❌ No rod or bait, try to buy")
 
@@ -266,16 +266,16 @@ def fish_ProgressDefault():
 def fish_ProgressCheckMiniGameStart():
     clicker.stop_clicking()
     if jinlema(g_FishMain.yugan):
-        "已进入钓鱼才算循环开始,避免其实在无限甩杆"
+        "Entered fishing only counts as start of loop, avoid infinite casting"
         g_FishMain.setStartTime()
         if FishMainLangFlag:
-            print("✅ 已成功甩杆进入钓鱼界面。")
+            print("✅ Successfully cast rod into fishing interface.")
         else:
             print("✅ Successfully threw a rod into the fishing interface.")
         g_FishMain.setstatus(2)
     else:
         if FishMainLangFlag:
-            print("❌ 甩杆失败，重新尝试甩杆")
+            print("❌ Failed to cast rod, trying again")
         else:
             print("❌ Failed to throw a rod, try again")
         g_FishMain.setstatus(0)
@@ -284,7 +284,7 @@ def fish_ProgressCheckHook():
     clicker.stop_clicking()
     if shanggoulema(g_FishMain.shanggoufind, g_FishMain.gamewindow):
         if FishMainLangFlag:
-            print("🎣 检测到鱼上钩了！准备钓鱼！")
+            print("🎣 Detected that the fish has been hooked! Ready to fish!")
         else:
             print("🎣 Detected that the fish has been hooked! Ready to fish!")
         g_FishMain.setstatus(3)
@@ -341,21 +341,21 @@ g_FishFunctionDic = {
 
 def fish_porgress():
     if FishMainLangFlag:
-        print("正在钓鱼中...")
-        logger.info("正在钓鱼中...")
+        print("Fishing in progress...")
+        logger.info("Fishing in progress...")
     else:
         print("Fishing in progress...")
         logger.info("Fishing in progress...")
     
     if g_FishMain.reload() is not True:
             return
-    # 主循环
+    # Main loop
     timeout = timedelta(minutes=0, seconds=30)
     g_FishMain.setStartTime()
     g_FishMain.resetTimeOutTimes()
     while True:
         fish_KeyboardStopScript()
-        # 如果已经超过30秒，重置计时
+        # If more than 30 seconds have passed, reset the timer
         if g_FishMain.getTimeLag() > timeout:
             g_FishMain.setStartTime()
             SwitchToGame()
@@ -380,12 +380,12 @@ def fish_main():
         fish_porgress()
     except KeyboardInterrupt:
         if FishMainLangFlag:
-            print("\n用户中断脚本")
+            print("\nUser interrupted the script")
         else:
             print("\nUser interrupted the script")
     except Exception as e:
         if FishMainLangFlag:
-            print(f"发生错误: {e}")
+            print(f"An error occurred: {e}")
         else:
             print(f"An error occurred: {e}")
     finally:

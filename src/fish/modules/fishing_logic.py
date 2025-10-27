@@ -37,18 +37,18 @@ def InitFishLogicLang(mylang):
         FishLogicLangFlag = False
 
 def fishing_choose(idx):
-    "用于给外部修改默认鱼饵类型"
+    "Used to modify the default bait type from external"
     global g_yuer_type
     global FishLogicLangFlag
     if idx == "0":
         if FishLogicLangFlag:
-            print(f"选择便宜鱼饵")
+            print(f"Choose cheap bait")
         else:
             print(f"Choose Regular bait")
         g_yuer_type = 0
     else:
         if FishLogicLangFlag:
-            print("选择默认鱼饵")
+            print("Choose special bait")
         else:
             print("Choose Special bait")
         g_yuer_type = 1
@@ -65,7 +65,7 @@ class PreciseMouseClicker:
     
     def start_clicking(self):
         if self.is_clicking:
-            # print("点击已在运行中")
+            # print("Clicking is already running")
             return
         
         self.is_clicking = True
@@ -80,7 +80,7 @@ class PreciseMouseClicker:
     
     def stop_clicking(self):
         if not self.is_clicking:
-            # print("点击未在运行中")
+            # print("Clicking is not running")
             return
         
         self.is_clicking = False
@@ -88,9 +88,9 @@ class PreciseMouseClicker:
             self.click_thread.join(timeout=1.0)
         
         total_time = time.perf_counter() - self.start_time
-        print(f"Stop Clicking，have clicked {self.click_count} times")
-        # print(f"总运行时间: {total_time:.2f}秒")
-        # print(f"平均点击频率: {self.click_count/total_time:.2f}次/秒")
+        print(f"Stop Clicking, have clicked {self.click_count} times")
+        # print(f"Total runtime: {total_time:.2f}seconds")
+        # print(f"Average click frequency: {self.click_count/total_time:.2f}times/second")
     
     def _precise_click_loop(self):
         interval_sec = self.interval_ms / 1000.0
@@ -115,7 +115,7 @@ class PreciseMouseClicker:
                     self._precise_sleep(sleep_time)
                 else:
                     next_time = current_time + interval_sec
-                    # print(f"警告: 点击延迟 {-sleep_time*1000:.2f}ms")
+                    # print(f"Warning: click delay {-sleep_time*1000:.2f}ms")
                     
         except pyautogui.FailSafeException:
             print("Failsafe triggered: mouse moved to upper left corner")
@@ -183,7 +183,7 @@ def purchase(sth):
     searchandmovetoclick("shop_x.png",trust,delay)
     global FishLogicLangFlag
     if FishLogicLangFlag:
-        print("购买成功")
+        print("Purchase successful")
     else:
         print("Purchase Success")
 
@@ -199,7 +199,7 @@ def youganma(yugan, yuer):
     temp1 = find_pic(yuganshot_cv, image_path, confidence=0.8,type = "A")
     if temp1 is not None:
         if FishLogicLangFlag:
-            print("❌ 鱼竿NOK")
+            print("❌ Fishing rod NOK")
         else:
             print("Fishing Pole NOK")
         pyautogui.keyDown("M")
@@ -211,7 +211,7 @@ def youganma(yugan, yuer):
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
             if FishLogicLangFlag:
-                print("❌ 鱼竿已用完，尝试买杆")
+                print("❌ Fishing rod is used up, trying to buy a rod")
             else:
                 print("No Fishing Pole,try to buy")
             purchase('gan')
@@ -224,7 +224,7 @@ def youganma(yugan, yuer):
             precise_sleep(0.5)
         return 0
     if FishLogicLangFlag:
-        print("✅ 鱼竿OK")
+        print("✅ Fishing rod OK")
     else:
         print("Fishing Pole OK")
     yuershot = pyautogui.screenshot(region=yuer)
@@ -234,7 +234,7 @@ def youganma(yugan, yuer):
     temp2 = find_pic(yuershot_cv, image_path, 0.80,type = "A")
     if temp2 is not None:
         if FishLogicLangFlag:
-            print("❌ 鱼饵NOK")
+            print("❌ Bait NOK")
         else:
             print("Bait NOK")
         pyautogui.keyDown("N")
@@ -246,7 +246,7 @@ def youganma(yugan, yuer):
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
             if FishLogicLangFlag:
-                print("❌ 鱼饵已用完，尝试买饵")
+                print("❌ Bait is used up, trying to buy bait")
             else:
                 print("No Bait,try to buy")
             purchase('er')
@@ -259,13 +259,13 @@ def youganma(yugan, yuer):
             precise_sleep(0.5)
         return 0
     if FishLogicLangFlag:
-        print("✅ 鱼饵OK")
+        print("✅ Bait OK")
     else:
         print("Bait OK")
     return 1
 
 def jinlema(yugan):
-    "检查鱼竿位置图标 在钓鱼则返回1，不在钓鱼则返回0"
+    "Check the fishing rod position icon. Return 1 if fishing, return 0 if not fishing"
     yuganshot = pyautogui.screenshot(region=yugan)
     yuganshot_cv = cv2.cvtColor(np.array(yuganshot), cv2.COLOR_RGB2BGR)
     image_path = full_imagePath("yugan_screenshot.png")
@@ -389,10 +389,37 @@ def detect_fish_rarity(fish_rarity_region):
     # Return if we have a reasonable match
     if best_match_ratio > 0.005:  # At least 0.5% of pixels match
         print(f"✅ Best match: {best_match_rarity} with ratio {best_match_ratio:.4f}")
-        return best_match_rarity
+    else:
+        print(f"❌ No rarity detected (best ratio: {best_match_ratio:.4f})")
     
-    print(f"❌ No rarity detected (best ratio: {best_match_ratio:.4f})")
-    return None
+    # Export full screen with rarity region highlighted
+    try:
+        full_screenshot = pyautogui.screenshot()
+        full_screenshot_cv = cv2.cvtColor(np.array(full_screenshot), cv2.COLOR_RGB2BGR)
+        
+        # Draw rectangle on the rarity region
+        top_left = (fish_rarity_region[0], fish_rarity_region[1])
+        bottom_right = (
+            fish_rarity_region[0] + fish_rarity_region[2],
+            fish_rarity_region[1] + fish_rarity_region[3]
+        )
+        
+        # Draw yellow rectangle with thick border
+        cv2.rectangle(full_screenshot_cv, top_left, bottom_right, (0, 255, 255), 3)
+        
+        # Add label
+        label = f"Fish Rarity Region ({fish_rarity_region[2]}x{fish_rarity_region[3]})"
+        cv2.putText(full_screenshot_cv, label, (top_left[0], top_left[1] - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+        
+        # Save the highlighted screenshot
+        debug_full_path = full_imagePath("debug_full_screenshot_with_rarity_region.png")
+        cv2.imwrite(debug_full_path, full_screenshot_cv)
+        print(f"Full screenshot with region saved to: {debug_full_path}")
+    except Exception as e:
+        print(f"⚠️ Error saving full screenshot: {e}")
+    
+    return best_match_rarity
 
 def log_fish_catch(rarity):
     """
@@ -499,13 +526,13 @@ def NotFindESC():
     else:
         return 0
 def SolveDaySwitch(pos1,pos2):
-    # 清除所有按键状态
+    # Clear all key states
     global clicker
     clicker.stop_clicking()
     pyautogui.keyUp('A')
     pyautogui.keyUp('D')
     pyautogui.mouseUp(button='left')
-    # 点掉跨日界面
+    # Click to close the daily reset interface
     pyautogui.keyDown('alt')
     pyautogui.moveTo(g_jixudiaoyu[0], g_jixudiaoyu[1])
     pyautogui.click()
@@ -515,9 +542,9 @@ def SolveDaySwitch(pos1,pos2):
     pyautogui.moveTo(pos2[0], pos2[1])
     pyautogui.click()
     pyautogui.keyUp('alt')
-    #避免过快检测ESC
+    # Avoid checking ESC too quickly
     precise_sleep(2)
-    # 到这里位置应该已经把月卡界面点掉了，避免在商店界面
+    # At this point, the monthly pass interface should have been closed, avoiding being in the shop interface
     counter = 0
     while(NotFindESC()):
         SolvePurchaseStoped()
