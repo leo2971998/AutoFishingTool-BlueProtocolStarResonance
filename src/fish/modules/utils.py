@@ -30,7 +30,7 @@ def get_suofang():
     # 定义一个名为get_suofang的函数，用于获取某个变量的值
     return g_suofang  # 返回g_suofang变量的值
 global UnitLangFlag
-UnitLangFlag = True #True:中文 False:English
+UnitLangFlag = True # True:Chinese False:English
 def InitUnitLang(mylang):
     global UnitLangFlag
     if mylang == "zh":
@@ -119,25 +119,25 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
             best_scale = scale
             best_size = (w_resized, h_resized)
         
-        print(f"scale 尺度 {scale:.2f}: match_val 匹配值 {match_val:.3f}")
+        print(f"scale {scale:.2f}: match_val {match_val:.3f}")
     
     # 检查是否找到匹配
     logger = GetLogger()
     if best_match_val >= threshold:
         x, y = best_match_loc
         w, h = best_size
-        print(f"best_Matched 最佳匹配: best_scale尺度 {best_scale:.2f},match_val 匹配值 {best_match_val:.3f}")
-        logger.debug(f"best_Matched 最佳匹配: best_scale尺度 {best_scale:.2f},match_val 匹配值 {best_match_val:.3f}")
+        print(f"best_Matched: best_scale {best_scale:.2f}, match_val {best_match_val:.3f}")
+        logger.debug(f"best_Matched: best_scale {best_scale:.2f}, match_val {best_match_val:.3f}")
         global g_suofang 
         g_suofang = best_scale
         global g_suofang_ratio
         g_suofang_ratio = best_match_val
-        print(f"1920 * 1080 scale ratio 缩放比例: {g_suofang}")
-        logger.debug(f"{1920 * g_suofang} * {1080 * g_suofang} cale ratio 缩放比例 : {g_suofang}")
+        print(f"1920 * 1080 scale ratio: {g_suofang}")
+        logger.debug(f"{1920 * g_suofang} * {1080 * g_suofang} scale ratio: {g_suofang}")
         return 1
     else:
-        print(f"can't find matched 未找到匹配，best_match_val 最佳匹配值 {best_match_val:.3f} lower than threshold低于阈值 {threshold}")
-        logger.warning(f"can't find matched 未找到匹配，best_match_val 最佳匹配值 {best_match_val:.3f} lower than threshold低于阈值 {threshold}")
+        print(f"can't find matched, best_match_val {best_match_val:.3f} lower than threshold {threshold}")
+        logger.warning(f"can't find matched, best_match_val {best_match_val:.3f} lower than threshold {threshold}")
         return None
     
 
@@ -220,7 +220,7 @@ def SwitchToGame():
         if switch_to_window_by_title(window_title):
             print(f"Successfully switched to window: {window_title}")
         else:
-            print(f"Canot find window with title containing'{window_title}' 的窗口")
+            print(f"Cannot find window with title containing '{window_title}'")
 
 def switch_to_window_by_title(window_title):
     try:
@@ -413,10 +413,10 @@ def debug_screenshot_coordinates(image, coords_dict, save_path=None):
             center_x, center_y = img_with_coords.shape[1] // 2, img_with_coords.shape[0] // 2
             cv2.line(img_with_coords, (center_x, center_y), (x, y), line_color, 1)
         else:
-            print(f"警告: 坐标 {label} ({x}, {y}) 超出图像范围")
+            print(f"Warning: Coordinates {label} ({x}, {y}) out of image bounds")
     
-    # 添加标题
-    title = f"坐标标记 (共{len(coords_dict)}个点)"
+    # Add title
+    title = f"Coordinate Markers ({len(coords_dict)} points)"
     cv2.putText(img_with_coords, title, (10, 30), font, 0.7, (255, 255, 255), 2)
     
     # # 添加网格线（可选）
@@ -429,7 +429,7 @@ def debug_screenshot_coordinates(image, coords_dict, save_path=None):
     # 如果提供了保存路径，则保存图像
     if save_path:
         cv2.imwrite(save_path, img_with_coords)
-        print(f"图像已保存到: {save_path}")
+        print(f"Image saved to: {save_path}")
     
     return img_with_coords
 
@@ -477,8 +477,8 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
         temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
         counter += 1
         if counter > 120:
-            print(f"searchandmovetoclick, cant find pic 未找到图片[{str}]")
-            logger.warning("searchandmovetoclick,cant find pic 未找到图片【%s】",str)
+            print(f"searchandmovetoclick, cant find pic [{str}]")
+            logger.warning("searchandmovetoclick, cant find pic [%s]",str)
             return 0
     data = dirinfo2pyautoguiinfo(temp)
     x = int(data[0] + 0.5 * data[2])
@@ -486,7 +486,7 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
     pyautogui.moveTo(x, y)
     PlayerCtl.leftmouse(delay)
     precise_sleep(delay)
-    logger.debug("Findpic 寻找图片【%s】，ClickPosIs点击位置是：（%f,%f）",str,x,y)
+    logger.debug("Findpic [%s], ClickPos: (%f,%f)",str,x,y)
     cac_relative_coords_log(x,y)
     return 1
 
@@ -497,6 +497,6 @@ def cac_relative_coords_log(x,y):
         return None
     x_rl = (x - g_gamewindow[0]) / g_gamewindow[2]
     y_rl = (y - g_gamewindow[1]) / g_gamewindow[3]
-    logger.debug("RelWindowPosIs相对窗口位置是：（%f,%f）",x_rl,y_rl)
+    logger.debug("RelWindowPos: (%f,%f)",x_rl,y_rl)
 def full_imagePath(str):
     return os.path.join(g_current_dir, str)

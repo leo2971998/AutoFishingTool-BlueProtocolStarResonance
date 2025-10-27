@@ -243,9 +243,9 @@ def fish_StopData():
     print(f"\n✅ Script stopped")
     print(f"📊 Final Statistics:")
     print(f"   Total fish caught: {g_FishMain.fishCounter}")
-    print(f"   ⭐ Mythical: {stats['mythical']}")
+    print(f"   🔵 Common: {stats['common']}")
     print(f"   💜 Rare: {stats['rare']}")
-    print(f"   💚 Common: {stats['common']}")
+    print(f"   ⭐ Mythical: {stats['mythical']}")
 
 def fish_ProgressDefault():
     clicker.stop_clicking()
@@ -294,39 +294,39 @@ def fish_ProgressFishing():
                     g_FishMain.youfind,
                     g_FishMain.jixufind,
                     g_FishMain.zhanglifind):
-        
-        # Wait a moment for the fish display to appear
-        time.sleep(1.5)
-        
-        # Detect fish rarity
-        rarity = detect_fish_rarity(g_FishMain.fish_rarity_region)
-        log_fish_catch(rarity)
+        print("🎣 The fish has been reeled in, ready for the next round of fishing\n\n")
+        logger.info(f"🐟 Fish reeled in")
+        g_FishMain.setstatus(4)
+
+def fish_ProgressFinishied():
+    clicker.stop_clicking()
+    
+    # Wait for the fish result screen to fully appear
+    time.sleep(1.0)
+    
+    # Detect fish rarity BEFORE clicking "Continue fishing"
+    rarity = detect_fish_rarity(g_FishMain.fish_rarity_region)
+    log_fish_catch(rarity)
+    
+    # Now click "Continue fishing"
+    if diaodaole():
+        lag = g_FishMain.getTimeLag()
         
         g_FishMain.addFishCounter()
         
         # Get current statistics
         stats = get_fish_statistics()
         
-        # Print fish caught message with statistics
-        print("🎣 The fish has been reeled in, ready for the next round of fishing\n")
+        # Print results
+        print(f"✅ The fish has been reeled in, this round took {lag.total_seconds():.1f}s\n")
         print(f"🐠 Currently caught {g_FishMain.fishCounter} fish~")
         print(f"📊 Fish Statistics:")
-        print(f"   ⭐ Mythical: {stats['mythical']}")
+        print(f"   🔵 Common: {stats['common']}")
         print(f"   💜 Rare: {stats['rare']}")
-        print(f"   💚 Common: {stats['common']}\n")
+        print(f"   ⭐ Mythical: {stats['mythical']}\n")
         
         logger.info(f"🐠 Currently caught {g_FishMain.fishCounter} fish~")
-        logger.info(f"Stats - Mythical: {stats['mythical']}, Rare: {stats['rare']}, Common: {stats['common']}")
         
-        g_FishMain.setstatus(4)
-
-def fish_ProgressFinishied():
-    clicker.stop_clicking()
-    if diaodaole():
-        if FishMainLangFlag:
-            print("✅ 鱼已收回，准备下一轮钓鱼\n\n")
-        else:
-            print("✅ The fish has been reeled in, ready for the next round of fishing\n\n")
         g_FishMain.setstatus(0)
         g_FishMain.setStartTime()
         g_FishMain.resetTimeOutTimes()
