@@ -122,8 +122,7 @@ def GuideInfomation():
     print("This script recognizes 16:9 game windows\n")
     print("Tip 1: Make sure the game has entered the fishing interface!")
     print("Tip 2: The script will automatically replenish Special fish bait after using all rods and bait")
-    print("Tip 3: Controls: [F5] to start, [F6] to pause (then choose restart/exit)")
-    print("Tip 4: You can use [PageUp] and [PageDown] to adjust detection time (default: 0.06s)\n")
+    print("Tip 3: Controls: [F5] to start, [F6] to pause (then choose restart/exit)\n")
     
     # Only ask for bait choice if not already saved
     if g_saved_bait_choice is None:
