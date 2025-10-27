@@ -470,12 +470,13 @@ def fish_area_cac(gamewindow):
         int(0.02 * gamewindow[3]),
     )
     
-    # Fish rarity detection area (right side, where colored rarity box appears)
+    # Fish rarity detection area (upper-right, where "Common" box appears)
+    # Based on 1920x1080: box is around (820, 610) with size ~(120, 35)
     fish_rarity_region = (
-        int(gamewindow[0] + 0.60 * gamewindow[2]),   # Right side of screen (60%)
-        int(gamewindow[1] + 0.55 * gamewindow[3]),   # Middle-upper area (55%)
-        int(0.30 * gamewindow[2]),                    # Width (30% of screen)
-        int(0.15 * gamewindow[3])                     # Height (15% of screen)
+        int(gamewindow[0] + 0.42 * gamewindow[2]),   # Start at 42% from left (~807px)
+        int(gamewindow[1] + 0.56 * gamewindow[3]),   # Start at 56% from top (~605px)
+        int(0.12 * gamewindow[2]),                    # Width 12% (~230px) to capture box
+        int(0.06 * gamewindow[3])                     # Height 6% (~65px) to capture box
     )
 
     global g_jixudiaoyu
