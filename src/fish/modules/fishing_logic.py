@@ -369,14 +369,15 @@ def detect_fish_rarity(fish_rarity_region):
     best_match_rarity = None
     best_match_ratio = 0
     
-    # Check each rarity color (blue, purple, yellow boxes)
+    # Analyze the captured image directly for color matching
     for rarity, target_color in FISH_RARITY_COLORS.items():
-        is_match, match_ratio = fuzzy_color_match(
-            fish_rarity_region, 
-            target_color, 
-            tolerance=50,          # Higher tolerance for box colors
-            match_threshold=0.01   # Low threshold since box is small
-        )
+        # Convert target color to numpy array for comparison
+        target_rgb = np.array(target_color)
+        
+        # Calculate color differences in the image
+        color_diff = np.abs(img_array - target_rgb)
+        matches = np.all(color_diff <= 60, axis=2)  # increased tolerance to 60
+        match_ratio = np.sum(matches) / matches.size
         
         print(f"Checking {rarity} (RGB {target_color}): match_ratio = {match_ratio:.4f}")
         
@@ -386,7 +387,7 @@ def detect_fish_rarity(fish_rarity_region):
             best_match_rarity = rarity
     
     # Return if we have a reasonable match
-    if best_match_ratio > 0.01:  # At least 1% of pixels match
+    if best_match_ratio > 0.005:  # At least 0.5% of pixels match
         print(f"✅ Best match: {best_match_rarity} with ratio {best_match_ratio:.4f}")
         return best_match_rarity
     
@@ -470,13 +471,13 @@ def fish_area_cac(gamewindow):
         int(0.02 * gamewindow[3]),
     )
     
-    # Fish rarity detection area (upper-right, where "Common" box appears)
-    # Based on 1920x1080: box is around (820, 610) with size ~(120, 35)
+    # Formula-based calculation to work across different resolutions
+    # Calibrated for 1920x1080: position (1080, 780), size (200, 80)
     fish_rarity_region = (
-        int(gamewindow[0] + 0.42 * gamewindow[2]),   # Start at 42% from left (~807px)
-        int(gamewindow[1] + 0.56 * gamewindow[3]),   # Start at 56% from top (~605px)
-        int(0.12 * gamewindow[2]),                    # Width 12% (~230px) to capture box
-        int(0.06 * gamewindow[3])                     # Height 6% (~65px) to capture box
+        int(gamewindow[0] + 0.56 * gamewindow[2]),   # 56% from left
+        int(gamewindow[1] + 0.72 * gamewindow[3]),   # 72% from top
+        int(0.10 * gamewindow[2]),                    # 10% width
+        int(0.08 * gamewindow[3])                     # 8% height
     )
 
     global g_jixudiaoyu
