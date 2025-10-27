@@ -17,6 +17,9 @@ g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
 
+# Save base pic directory to avoid double appending language on restart
+g_base_pic_dir = g_current_dir
+
 from fish.modules.logger import GetLogger
 # print(f"{g_current_dir}")
 global g_suofang 
@@ -38,6 +41,8 @@ def InitUnitLang(mylang):
     else:
         UnitLangFlag = False
     global g_current_dir
+    # Reset to base pic directory before appending language (fixes restart bug)
+    g_current_dir = g_base_pic_dir
     g_current_dir = full_imagePath(mylang)
     print(f"InitUnitLang {g_current_dir}")
 
