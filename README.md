@@ -10,6 +10,26 @@ An advanced automatic fishing tool for **Blue Protocol** with real-time fish rar
 - 🔍 **Debug Mode** - Exports screenshots for troubleshooting
 - 🛒 **Auto-Purchase** - Automatically buys rods and bait when depleted
 
+---
+
+## 📋 Prerequisites
+
+### Install Python (REQUIRED)
+
+1. Download Python 3.12+ from https://www.python.org/downloads/
+2. **⚠️ IMPORTANT:** During installation:
+   - ✅ Check the box: **"Add Python to PATH"**
+   - ✅ Check the box: **"Install pip"**
+3. Click "Install Now"
+4. Verify installation:
+   - Open Command Prompt
+   - Type: `python --version`
+   - Should show: Python 3.12.x or higher
+
+**Why Python 3.12?** Better performance, improved security, and better compatibility.
+
+---
+
 ## 🚀 Quick Start (Just 2 Steps!)
 
 ### Step 1: Install
@@ -34,15 +54,20 @@ That's it! 🎉
 
 ## ⚠️ Important
 
+- ✅ **Python 3.12+** installed and working
 - ✅ Run as **Administrator** (Right-click → Run as administrator)
-- ✅ **Python 3.9+** must be installed (download from python.org)
-- ✅ Check "Add Python to PATH" during Python installation
 - ✅ Game window must be visible
 - ✅ Don't move the mouse while fishing
+- ✅ Close Discord, streaming software, overlays
 
 ---
 
 ## 🐛 Troubleshooting
+
+**"Python is not found":**
+- Install Python 3.12+ from python.org
+- Make sure "Add Python to PATH" was checked
+- Restart your computer
 
 **Script won't start:**
 - Run `install.bat` first

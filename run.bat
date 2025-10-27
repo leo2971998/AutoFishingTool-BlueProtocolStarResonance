@@ -30,7 +30,7 @@ if not exist "src" (
     exit /b 1
 )
 
-echo ⚠️  IMPORTANT REQUIREMENTS:
+echo   IMPORTANT REQUIREMENTS:
 echo.
 echo   1. Run this program as ADMINISTRATOR
 echo   2. Blue Protocol game must be running
