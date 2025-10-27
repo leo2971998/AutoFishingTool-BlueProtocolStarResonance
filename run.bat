@@ -32,10 +32,9 @@ if not exist "src" (
 
 echo   IMPORTANT REQUIREMENTS:
 echo.
-echo   1. Run this program as ADMINISTRATOR
-echo   2. Blue Protocol game must be running
-echo   3. Game window must be visible
-echo   4. Close all other overlays
+echo   1. Blue Protocol game must be running
+echo   2. Game window must be visible
+echo   3. Close all other overlays
 echo.
 echo CONTROLS:
 echo   - Press F5 to START the script

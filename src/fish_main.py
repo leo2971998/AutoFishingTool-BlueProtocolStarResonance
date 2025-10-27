@@ -109,9 +109,6 @@ def InitAllLang():
 def GuideInfomation():
     print("\n\nWelcome to the Star Echo Fishing Script")
     print("This script recognizes 16:9 game windows\n")
-    print("⚠️  IMPORTANT: Run this program as ADMINISTRATOR!")
-    print("⚠️  IMPORTANT: Run this program as ADMINISTRATOR!")
-    print("⚠️  IMPORTANT: Run this program as ADMINISTRATOR!\n")
     print("Tip 1: Make sure the game has entered the fishing interface!")
     print("Tip 2: The script will automatically replenish Special fish bait after using all rods and bait")
     print("Tip 3: If infinite clicking occurs, move mouse to upper-left corner, then press [F6] to pause")

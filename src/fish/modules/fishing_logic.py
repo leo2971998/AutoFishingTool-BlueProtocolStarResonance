@@ -360,11 +360,10 @@ def detect_fish_rarity(fish_rarity_region):
     screenshot = pyautogui.screenshot(region=fish_rarity_region)
     img_array = np.array(screenshot)
     
-    # Save debug screenshot to verify capture area
+    # Save debug screenshot to verify capture area (silent)
     screenshot_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
     debug_path = full_imagePath("debug_fish_rarity.png")
     cv2.imwrite(debug_path, screenshot_cv)
-    print(f"Debug screenshot saved to: {debug_path}")
     
     best_match_rarity = None
     best_match_ratio = 0
@@ -379,45 +378,10 @@ def detect_fish_rarity(fish_rarity_region):
         matches = np.all(color_diff <= 60, axis=2)  # increased tolerance to 60
         match_ratio = np.sum(matches) / matches.size
         
-        print(f"Checking {rarity} (RGB {target_color}): match_ratio = {match_ratio:.4f}")
-        
         # Track the best match
         if match_ratio > best_match_ratio:
             best_match_ratio = match_ratio
             best_match_rarity = rarity
-    
-    # Return if we have a reasonable match
-    if best_match_ratio > 0.005:  # At least 0.5% of pixels match
-        print(f"✅ Best match: {best_match_rarity} with ratio {best_match_ratio:.4f}")
-    else:
-        print(f"❌ No rarity detected (best ratio: {best_match_ratio:.4f})")
-    
-    # Export full screen with rarity region highlighted
-    try:
-        full_screenshot = pyautogui.screenshot()
-        full_screenshot_cv = cv2.cvtColor(np.array(full_screenshot), cv2.COLOR_RGB2BGR)
-        
-        # Draw rectangle on the rarity region
-        top_left = (fish_rarity_region[0], fish_rarity_region[1])
-        bottom_right = (
-            fish_rarity_region[0] + fish_rarity_region[2],
-            fish_rarity_region[1] + fish_rarity_region[3]
-        )
-        
-        # Draw yellow rectangle with thick border
-        cv2.rectangle(full_screenshot_cv, top_left, bottom_right, (0, 255, 255), 3)
-        
-        # Add label
-        label = f"Fish Rarity Region ({fish_rarity_region[2]}x{fish_rarity_region[3]})"
-        cv2.putText(full_screenshot_cv, label, (top_left[0], top_left[1] - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-        
-        # Save the highlighted screenshot
-        debug_full_path = full_imagePath("debug_full_screenshot_with_rarity_region.png")
-        cv2.imwrite(debug_full_path, full_screenshot_cv)
-        print(f"Full screenshot with region saved to: {debug_full_path}")
-    except Exception as e:
-        print(f"⚠️ Error saving full screenshot: {e}")
     
     return best_match_rarity
 
@@ -429,15 +393,7 @@ def log_fish_catch(rarity):
     
     if rarity:
         g_fish_statistics[rarity] += 1
-        
-        rarity_emoji = {
-            'common': '🔵',     # Blue circle
-            'rare': '💜',       # Purple heart
-            'mythical': '⭐'    # Yellow star
-        }
-        
-        emoji = rarity_emoji.get(rarity, '🐟')
-        print(f"{emoji} Detected: {rarity.upper()} fish!")
+        print(f"Caught {rarity.capitalize()} fish!")
         
         logger = GetLogger()
         logger.info(f"Caught {rarity} fish")
