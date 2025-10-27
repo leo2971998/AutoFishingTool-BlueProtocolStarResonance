@@ -23,11 +23,11 @@ g_fish_statistics = {
     'common': 0     # Green
 }
 
-# Fish rarity color definitions (RGB values)
+# Fish rarity color definitions - these are the BACKGROUND BOX colors
 FISH_RARITY_COLORS = {
-    'mythical': (255, 215, 0),   # Yellow/Gold
-    'rare': (147, 51, 234),       # Purple
-    'common': (34, 197, 94)       # Green
+    'common': (41, 128, 185),      # Blue background box
+    'rare': (155, 89, 182),         # Purple background box  
+    'mythical': (241, 196, 15)      # Yellow background box
 }
 def InitFishLogicLang(mylang):
     global FishLogicLangFlag
@@ -118,10 +118,10 @@ class PreciseMouseClicker:
                     # print(f"警告: 点击延迟 {-sleep_time*1000:.2f}ms")
                     
         except pyautogui.FailSafeException:
-            print("故障安全触发：鼠标移动到屏幕左上角")
+            print("Failsafe triggered: mouse moved to upper left corner")
             self.is_clicking = False
         except Exception as e:
-            print(f"点击过程中发生错误: {e}")
+            print(f"Error during clicking: {e}")
             self.is_clicking = False
     
     def _precise_sleep(self, duration):
@@ -353,40 +353,44 @@ def init_clicker():
 
 def detect_fish_rarity(fish_rarity_region):
     """
-    Detect fish rarity by checking colors in the fish display region
-    Returns: 'mythical', 'rare', 'common', or None
+    Detect fish rarity by checking the colored background box
+    Returns: 'common', 'rare', 'mythical', or None
     """
     # Take screenshot of the fish rarity region
     screenshot = pyautogui.screenshot(region=fish_rarity_region)
     img_array = np.array(screenshot)
     
-    # Save debug screenshot (optional)
+    # Save debug screenshot to verify capture area
     screenshot_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
     debug_path = full_imagePath("debug_fish_rarity.png")
     cv2.imwrite(debug_path, screenshot_cv)
+    print(f"Debug screenshot saved to: {debug_path}")
     
     best_match_rarity = None
     best_match_ratio = 0
     
-    # Check each rarity color
+    # Check each rarity color (blue, purple, yellow boxes)
     for rarity, target_color in FISH_RARITY_COLORS.items():
         is_match, match_ratio = fuzzy_color_match(
             fish_rarity_region, 
             target_color, 
-            tolerance=40,        # Color tolerance
-            match_threshold=0.05  # Lower threshold since fish icons are small
+            tolerance=50,          # Higher tolerance for box colors
+            match_threshold=0.01   # Low threshold since box is small
         )
         
-        print(f"Checking {rarity}: match_ratio = {match_ratio:.3f}")
+        print(f"Checking {rarity} (RGB {target_color}): match_ratio = {match_ratio:.4f}")
         
         # Track the best match
         if match_ratio > best_match_ratio:
             best_match_ratio = match_ratio
             best_match_rarity = rarity
     
-    # Only return if we have a reasonable match
-    if best_match_ratio > 0.05:
+    # Return if we have a reasonable match
+    if best_match_ratio > 0.01:  # At least 1% of pixels match
+        print(f"✅ Best match: {best_match_rarity} with ratio {best_match_ratio:.4f}")
         return best_match_rarity
+    
+    print(f"❌ No rarity detected (best ratio: {best_match_ratio:.4f})")
     return None
 
 def log_fish_catch(rarity):
@@ -398,11 +402,10 @@ def log_fish_catch(rarity):
     if rarity:
         g_fish_statistics[rarity] += 1
         
-        # Just print what rarity was caught
         rarity_emoji = {
-            'mythical': '⭐',
-            'rare': '💜', 
-            'common': '💚'
+            'common': '🔵',     # Blue circle
+            'rare': '💜',       # Purple heart
+            'mythical': '⭐'    # Yellow star
         }
         
         emoji = rarity_emoji.get(rarity, '🐟')
@@ -411,7 +414,7 @@ def log_fish_catch(rarity):
         logger = GetLogger()
         logger.info(f"Caught {rarity} fish")
     else:
-        print("🐟 Fish rarity not detected")
+        print("⚠️ Fish rarity not detected - check debug_fish_rarity.png")
 
 def get_fish_statistics():
     """Return current fish statistics"""
@@ -467,12 +470,12 @@ def fish_area_cac(gamewindow):
         int(0.02 * gamewindow[3]),
     )
     
-    # Fish rarity detection area (left bottom corner)
+    # Fish rarity detection area (right side, where colored rarity box appears)
     fish_rarity_region = (
-        int(gamewindow[0] + 0.02 * gamewindow[2]),   # Left edge
-        int(gamewindow[1] + 0.85 * gamewindow[3]),    # Bottom area
-        int(0.15 * gamewindow[2]),                     # Width (15% of screen)
-        int(0.10 * gamewindow[3])                      # Height (10% of screen)
+        int(gamewindow[0] + 0.60 * gamewindow[2]),   # Right side of screen (60%)
+        int(gamewindow[1] + 0.55 * gamewindow[3]),   # Middle-upper area (55%)
+        int(0.30 * gamewindow[2]),                    # Width (30% of screen)
+        int(0.15 * gamewindow[3])                     # Height (15% of screen)
     )
 
     global g_jixudiaoyu
